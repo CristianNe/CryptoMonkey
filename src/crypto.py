@@ -1,10 +1,11 @@
 class Crypto:
 
-    def __init__(self, name, ticker, price, marketcap):
+    def __init__(self, name, ticker, price, marketCap):
         self.name = name
         self.ticker = ticker
         self.price = price
-        self.marketcap = marketcap
+        self.marketCap = marketCap
 
-    def setPrice(self, price):
+    def update(self, price, marketCap):
         self.price = price
+        self.marketCap = marketCap

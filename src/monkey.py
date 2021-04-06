@@ -9,9 +9,10 @@ class Monkey():
         if numberOfAssets is None:
             numberOfAssets = random.randint(1,25)
         for i in range(numberOfAssets):
-            if i == numberOfAssets - 1:
+            if i < numberOfAssets - 1:
+                self.buyRandomCrypto()
+            else:
                 self.buyRandomCrypto(blowRestOfBudget=True)
-            self.buyRandomCrypto()
 
         self.showPortfolio()
 
@@ -25,9 +26,9 @@ class Monkey():
             amountToBuyInPercent = 1
         else:
             amountToBuyInPercent = random.random()
-        crypto = self.buyCrypto(crypto, amountToBuyInPercent)
+        boughtCrypto = self.buyCrypto(crypto, amountToBuyInPercent)
 
-        self.portfolio.add(crypto) #crypto will be a json; ToDO: build parse function in new portfolio class
+        self.portfolio.add(boughtCrypto) #crypto will be a json; ToDO: build parse function in new portfolio class
 
     def buyCrypto(self, crypto, amountInPercent):
         moneyToBeSpent = self.budget * amountInPercent
@@ -51,6 +52,7 @@ class Monkey():
         return pick
 
     def checkCriteria(self, crypto):
+        #ToDo: extract markets and ticker symbol from crypto object
         market = []
         ticker = ""
         return self.exchangeTest(market) and self.isNotStablecoin(ticker)
