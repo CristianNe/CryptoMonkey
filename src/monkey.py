@@ -8,6 +8,7 @@ class Monkey():
 
     def __init__(self):
         self.budget = 0
+        self.portfolioList = {}
         self.portfolio = Portfolio()
         self.coingecko = CoinGeckoAPI()
 
@@ -64,17 +65,10 @@ class Monkey():
         if blowRestOfBudget is True:
             amountToBuyInPercent = 1
         else:
-            amountToBuyInPercent = random.random()
+            amountToBuyInPercent = round(random.random(), 2)
         boughtCrypto, tokens = self.buyCrypto(crypto, amountToBuyInPercent)
 
         self.portfolio.add(boughtCrypto, tokens) #crypto will be a json; ToDO: build parse function in new portfolio class
-
-    def buyCrypto(self, crypto, amountInPercent):
-        moneyToBeSpent = self.budget * amountInPercent
-        tokens = moneyToBeSpent / crypto.price
-        self.budget -= moneyToBeSpent
-
-        return crypto, tokens
 
     #takes in Json list of cryptos and returns a Crypto object
     def pickRandomCrypto(self, coinList):
@@ -83,14 +77,21 @@ class Monkey():
         while(satisfiesCriteria is False):
             pick = random.choice(coinList)
             satisfiesCriteria = self.checkCriteria(pick)
-
         assert pick is not None, "You didn't pick anything, fool!"
         crypto = Crypto(pick)
+
         return crypto
+
+    def buyCrypto(self, crypto, amountInPercent):
+        moneyToBeSpent = self.budget * amountInPercent
+        tokens = moneyToBeSpent / crypto.price
+        self.budget -= moneyToBeSpent
+
+        return crypto, tokens
 
     def checkCriteria(self, crypto):
         #ToDo: extract markets and ticker symbol from crypto object
-        symbol = crypto["symbol"]
+        symbol = crypto["symbol"].lower()
         marketData = self.coingecko.get_coin_by_id(
             id=crypto["id"],
             localization="false",
@@ -114,6 +115,7 @@ class Monkey():
 
     def isNotStablecoin(self, symbol):
         prohibitedTickers = ["usdc", "usdt", "ust", "tusd", "dai", "pax"]
+
         return symbol not in prohibitedTickers
 
     def showPortfolio(self):
