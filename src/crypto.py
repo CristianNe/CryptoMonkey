@@ -29,6 +29,7 @@ class Crypto:
         #  roi: null,
         #  last_updated: DateString
         # }
+        self.id = cryptoData["id"]
         self.name = cryptoData["name"]
         self.symbol = cryptoData["symbol"]
         self.price = cryptoData["current_price"]

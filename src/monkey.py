@@ -116,6 +116,18 @@ class Monkey():
         prohibitedTickers = ["usdc", "usdt", "ust", "tusd", "dai", "pax"]
         return symbol not in prohibitedTickers
 
+    def showPortfolio(self):
+        self.updatePortfolio()
+        portfolio = self.portfolio.show()
+        self.postPortfolio(portfolio)
+
+    def updatePortfolio(self):
+        assetIds = []
+        for asset in self.portfolio.assets:
+            assetIds.append(asset.Crypto.id)
+        currentMarketData = self.coingecko.get_price(ids=assetIds, vs_currencies="usd", include_market_cap=True)
+        self.portfolio.update(currentMarketData)
+
 
 
 
