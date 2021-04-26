@@ -28,7 +28,7 @@ class Portfolio:
             # add the updated asset value to portfolio total value
             self.portfolioValue += asset.totalValue
 
-    def show(self):
+    def toString(self):
         valueChange = round((self.portfolioValue/self.startValue * 100)-100,2)
         portfolio = "[Portfolio]\ntotal portfolio value: {0} $\n".format(self.portfolioValue)
         portfolio += "change: {0}%\n".format(valueChange)

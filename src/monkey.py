@@ -9,10 +9,10 @@ class Monkey():
     def __init__(self):
         self.budget = 0
         self.portfolioList = {}
-        self.portfolio = Portfolio()
+        #self.portfolio = Portfolio()
         self.coingecko = CoinGeckoAPI()
 
-    def createPortfolio(self, numberOfAssets=None):
+    def createPortfolio(self, portfolio, numberOfAssets=None):
         if numberOfAssets is None:
             numberOfAssets = random.randint(1,25)
         #Get Coins
@@ -25,13 +25,13 @@ class Monkey():
         )
         for i in range(numberOfAssets):
             if i < numberOfAssets - 1:
-                self.buyRandomCrypto(coinList)
+                self.buyRandomCrypto(portfolio, coinList)
             else:
-                self.buyRandomCrypto(coinList, blowRestOfBudget=True)
+                self.buyRandomCrypto(portfolio, coinList, blowRestOfBudget=True)
 
         self.showPortfolio()
 
-    def buyRandomCrypto(self, coinList, blowRestOfBudget=False):
+    def buyRandomCrypto(self, portfolio, coinList, blowRestOfBudget=False):
         #coinList cointains a list of JSON objects of coins with the following data
         #{ id: String,
         #  symbol: String,
@@ -68,7 +68,7 @@ class Monkey():
             amountToBuyInPercent = round(random.random(), 2)
         boughtCrypto, tokens = self.buyCrypto(crypto, amountToBuyInPercent)
 
-        self.portfolio.add(boughtCrypto, tokens) #crypto will be a json; ToDO: build parse function in new portfolio class
+        portfolio.add(boughtCrypto, tokens) #crypto will be a json; ToDO: build parse function in new portfolio class
 
     #takes in Json list of cryptos and returns a Crypto object
     def pickRandomCrypto(self, coinList):
@@ -118,18 +118,43 @@ class Monkey():
 
         return symbol not in prohibitedTickers
 
-    def showPortfolio(self):
-        self.updatePortfolio()
-        portfolio = self.portfolio.show()
-        self.postPortfolio(portfolio)
+    def showPortfolio(self, name, portfolio):
+        self.updatePortfolio(portfolio)
+        self.postPortfolio(name, portfolio.toString())
 
-    def updatePortfolio(self):
+    def updatePortfolio(self, portfolio):
         assetIds = []
-        for asset in self.portfolio.assets:
+        for asset in portfolio.assets:
             assetIds.append(asset.Crypto.id)
         currentMarketData = self.coingecko.get_price(ids=assetIds, vs_currencies="usd", include_market_cap=True)
-        self.portfolio.update(currentMarketData)
+        portfolio.update(currentMarketData)
 
+    def postPortfolio(self, name, portfolioString):
+
+
+    def botCreatePortfolio(self, numberOfAssets=None, portfolioname=None):
+        # initiate empty Portfolio
+        portfolio = Portfolio()
+        if portfolioname is not None:
+            if not self.portfolioList.keys().__contains__(portfolioname):
+                self.portfolioList[portfolioname] = portfolio
+            else:
+                self.sendNameTakenMsg(portfolioname)
+        else:
+            self.portfolioList[self.portfolioList.__len__()] = portfolio
+
+        self.createPortfolio(portfolio, numberOfAssets=numberOfAssets)
+
+    def botShowPortfolio(self, portfolioname=None):
+        keys = list(self.portfolioList.keys())
+        if portfolioname is None:
+            # show last added portfolio
+            name = keys[keys.__len__() - 1]
+            self.showPortfolio(name, self.portfolioList[name])
+        elif portfolioname in keys:
+            self.showPortfolio(portfolioname, self.portfolioList[portfolioname])
+        else:
+            self.sendNameNotFoundMsg(portfolioname)
 
 
 
